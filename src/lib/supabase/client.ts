@@ -1,4 +1,5 @@
 import { createBrowserClient } from "@supabase/ssr"
+import type { Database } from "@/lib/types/database"
 
 /**
  * Supabase client for use in Client Components.
@@ -12,7 +13,7 @@ export function createClient() {
   // Non-null: these are build-time-injected NEXT_PUBLIC_* env vars that must
   // be set for the app to function at all; failing fast here is preferable
   // to a silently-undefined Supabase client.
-  return createBrowserClient(
+  return createBrowserClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
