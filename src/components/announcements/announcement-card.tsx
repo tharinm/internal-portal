@@ -27,16 +27,16 @@ export function AnnouncementCard({ announcement, currentUserId }: AnnouncementCa
   return (
     <Card>
       <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0 pb-4">
-        <div className="flex gap-4">
+        <div className="flex flex-1 min-w-0 gap-3 sm:gap-4">
           <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">
             {authorInitial}
           </div>
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <CardTitle className="tracking-tight">{announcement.title}</CardTitle>
+              <CardTitle className="tracking-tight text-base sm:text-lg">{announcement.title}</CardTitle>
               {announcement.is_pinned && <Badge>Pinned</Badge>}
             </div>
-            <CardDescription>
+            <CardDescription className="truncate sm:whitespace-normal">
               {announcement.author_email} &middot;{" "}
               <span className="font-mono text-xs">
                 {dateFormatter.format(new Date(announcement.created_at))}
@@ -45,7 +45,7 @@ export function AnnouncementCard({ announcement, currentUserId }: AnnouncementCa
           </div>
         </div>
         {isAuthor && (
-          <div className="flex items-center gap-1">
+          <div className="flex shrink-0 items-center gap-1 -mr-2">
             <EditButton announcement={announcement} />
             <DeleteButton announcementId={announcement.id} />
           </div>

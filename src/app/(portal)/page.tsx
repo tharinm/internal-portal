@@ -16,9 +16,11 @@ export default async function FeedPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col px-4 sm:px-6 pb-12">
-      <div className="sticky top-14 z-10 flex items-center justify-between bg-background/95 backdrop-blur-sm py-4 sm:py-6 -mx-4 px-4 sm:-mx-6 sm:px-6 mb-2">
-        <h1 className="text-2xl font-semibold tracking-tight">Announcements</h1>
-        <CreatePostDialog />
+      <div className="sticky top-14 z-10 flex items-center justify-between gap-3 bg-background/95 backdrop-blur-sm py-4 sm:py-6 -mx-4 px-4 sm:-mx-6 sm:px-6 mb-2">
+        <h1 className="text-xl sm:text-2xl font-semibold tracking-tight truncate">Announcements</h1>
+        <div className="shrink-0">
+          <CreatePostDialog />
+        </div>
       </div>
       <div className="flex flex-col gap-4">
         {announcements && announcements.length > 0 ? (
