@@ -1,8 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { useActionState } from "react"
-import { Loader2 } from "lucide-react"
+import { useActionState, useState } from "react"
+import { Loader2, Eye, EyeOff } from "lucide-react"
 
 import { login } from "@/lib/actions/auth"
 import {
@@ -23,11 +23,12 @@ type LoginFormProps = {
 
 export function LoginForm({ redirectTo }: LoginFormProps) {
   const [state, formAction, pending] = useActionState(login, undefined)
+  const [showPassword, setShowPassword] = useState(false)
 
   return (
     <Card className="w-full max-w-sm">
-      <CardHeader>
-        <CardTitle className="tracking-tight">Sign in</CardTitle>
+      <CardHeader className="text-center">
+        <CardTitle className="tracking-tight text-xl text-primary font-semibold">Sign in</CardTitle>
         <CardDescription>
           Sign in with your team email to access the internal portal.
         </CardDescription>
@@ -36,9 +37,6 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
         <input type="hidden" name="redirectTo" value={redirectTo} />
         <CardContent>
           <FieldGroup>
-            {state?.error && (
-              <FieldError role="alert">{state.error}</FieldError>
-            )}
             <Field data-invalid={!!state?.fieldErrors?.email}>
               <FieldLabel htmlFor="email">Email</FieldLabel>
               <Input
@@ -56,18 +54,36 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
             </Field>
             <Field data-invalid={!!state?.fieldErrors?.password}>
               <FieldLabel htmlFor="password">Password</FieldLabel>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                aria-invalid={!!state?.fieldErrors?.password}
-                required
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  aria-invalid={!!state?.fieldErrors?.password}
+                  className="pr-9"
+                  required
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 flex items-center pr-2.5 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-r-lg"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" aria-hidden="true" />
+                  ) : (
+                    <Eye className="h-4 w-4" aria-hidden="true" />
+                  )}
+                </button>
+              </div>
               <FieldError
                 errors={state?.fieldErrors?.password?.map((message) => ({ message }))}
               />
             </Field>
+            {state?.error && (
+              <FieldError role="alert" className="text-center">{state.error}</FieldError>
+            )}
           </FieldGroup>
         </CardContent>
         <CardFooter className="mt-4 flex-col items-stretch gap-3">

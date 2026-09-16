@@ -1,10 +1,8 @@
-import Link from "next/link"
 import { Megaphone } from "lucide-react"
 
 import { createClient } from "@/lib/supabase/server"
-import { AnnouncementForm } from "@/components/announcements/announcement-form"
+import { CreatePostDialog } from "@/components/announcements/create-post-dialog"
 import { AnnouncementCard } from "@/components/announcements/announcement-card"
-import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 
 export default async function FeedPage() {
@@ -17,9 +15,10 @@ export default async function FeedPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-6 sm:py-8">
-      <h1 className="text-2xl font-semibold tracking-tight">Announcements</h1>
-      <AnnouncementForm />
-      <Separator />
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold tracking-tight">Announcements</h1>
+        <CreatePostDialog />
+      </div>
       <div className="flex flex-col gap-4">
         {announcements && announcements.length > 0 ? (
           announcements.map((announcement) => (
@@ -34,9 +33,11 @@ export default async function FeedPage() {
                 Be the first to share an update with the team.
               </p>
             </div>
-            <Button render={<Link href="#announcement-form" />} size="sm">
-              Post an announcement
-            </Button>
+            <CreatePostDialog
+              trigger={
+                <Button size="sm">Post an announcement</Button>
+              }
+            />
           </div>
         )}
       </div>
