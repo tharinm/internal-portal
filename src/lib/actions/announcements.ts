@@ -60,3 +60,58 @@ export async function createAnnouncement(
   revalidatePath("/")
   return { success: true }
 }
+
+export async function deleteAnnouncement(id: string): Promise<{ success?: boolean; error?: string }> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { error: "Unauthorized" }
+
+  // RLS ensures they can only delete their own
+  const { error } = await supabase.from("announcements").delete().eq("id", id).eq("author_id", user.id)
+  
+  if (error) {
+    return { error: "Couldn't delete announcement." }
+  }
+
+  revalidatePath("/")
+  return { success: true }
+}
+
+export async function updateAnnouncement(
+  id: string,
+  _prevState: CreateAnnouncementState,
+  formData: FormData
+): Promise<CreateAnnouncementState> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return { error: "You must be signed in to edit an announcement." }
+  }
+
+  const parsed = createAnnouncementSchema.safeParse({
+    title: formData.get("title"),
+    body: formData.get("body"),
+    isPinned: formData.get("isPinned") === "on",
+  })
+  if (!parsed.success) {
+    return { fieldErrors: parsed.error.flatten().fieldErrors }
+  }
+
+  const { error } = await supabase.from("announcements").update({
+    title: parsed.data.title,
+    body: parsed.data.body,
+    is_pinned: parsed.data.isPinned,
+  }).eq("id", id).eq("author_id", user.id)
+
+  if (error) {
+    return { error: "Couldn't update the announcement. Please try again." }
+  }
+
+  revalidatePath("/")
+  return { success: true }
+}

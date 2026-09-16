@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 
 export default async function FeedPage() {
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
   const { data: announcements } = await supabase
     .from("announcements")
     .select("*")
@@ -14,15 +15,15 @@ export default async function FeedPage() {
     .order("created_at", { ascending: false })
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-6 sm:py-8">
-      <div className="flex items-center justify-between">
+    <div className="mx-auto flex w-full max-w-2xl flex-col px-4 sm:px-6 pb-12">
+      <div className="sticky top-12 sm:top-[57px] z-10 flex items-center justify-between bg-background/95 backdrop-blur-sm py-4 sm:py-6 -mx-4 px-4 sm:-mx-6 sm:px-6 mb-2">
         <h1 className="text-2xl font-semibold tracking-tight">Announcements</h1>
         <CreatePostDialog />
       </div>
       <div className="flex flex-col gap-4">
         {announcements && announcements.length > 0 ? (
           announcements.map((announcement) => (
-            <AnnouncementCard key={announcement.id} announcement={announcement} />
+            <AnnouncementCard key={announcement.id} announcement={announcement} currentUserId={user?.id} />
           ))
         ) : (
           <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed py-12 text-center">
