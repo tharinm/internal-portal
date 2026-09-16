@@ -1,8 +1,6 @@
 import Link from "next/link"
-import { LogOut } from "lucide-react"
-
 import { logout } from "@/lib/actions/auth"
-import { Button } from "@/components/ui/button"
+import { SignOutButton } from "@/components/auth/sign-out-button"
 
 type TopBarProps = {
   userEmail: string
@@ -22,10 +20,7 @@ export function TopBar({ userEmail }: TopBarProps) {
           {userEmail}
         </span>
         <form action={logout}>
-          <Button type="submit" variant="secondary" size="sm" className="font-medium">
-            <LogOut className="mr-1.5 size-4" aria-hidden="true" />
-            Sign out
-          </Button>
+          <SignOutButton />
         </form>
       </div>
     </header>

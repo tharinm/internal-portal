@@ -29,14 +29,17 @@ A small login-gated internal portal built for the take-home assignment. Team mem
    - **Off**: signing up at `/signup` logs you straight in.
    - **On**: signing up shows a "check your email" message; the confirmation link routes through `src/app/auth/callback/route.ts` and then into the app.
 
-5. **(Optional) Seed a demo login** — run [`supabase/seed_demo_user.sql`](./supabase/seed_demo_user.sql) once in the SQL Editor to create a ready-to-use account, so you can sign in immediately without going through `/signup` first:
+5. **(Optional) Use the seeded demo accounts** — the connected Supabase project already has two confirmed demo accounts with 3 sample announcements posted between them, so you can sign in immediately without going through `/signup` first:
 
    ```
-   email:    demo@internalportal.dev
-   password: demo12345
+   email:    demo@internal-portal.dev
+   password: DemoPass123!
+
+   email:    sarah.chen@internal-portal.dev
+   password: DemoPass123!
    ```
 
-   This is a throwaway account for reviewing the app — it has no special "admin" role (there isn't one; see Key decisions below) and no seeded announcements. Skip this step if you'd rather just sign up your own account.
+   These are throwaway accounts for reviewing the app — no special "admin" role (there isn't one; see Key decisions below). They were created via Supabase's Admin API rather than a SQL script, since hand-inserting rows into `auth.users`/`auth.identities` bypasses Supabase's internal invariants and isn't officially supported. Skip this step if you'd rather just sign up your own account, or if you're running against a different Supabase project (these accounts only exist in the one this repo is currently configured against).
 
 6. **Run the dev server**
 
@@ -52,7 +55,7 @@ A small login-gated internal portal built for the take-home assignment. Team mem
 - **RLS is the real security boundary.** Every Supabase query runs with the signed-in user's session; Postgres policies (not application code) decide who can read/write which rows. Announcements are readable by any signed-in user but only writable by their author. Server Actions still re-check `auth.getUser()` themselves before writing, since route protection (`src/proxy.ts`) is only an optimistic check for UX, not the authorization boundary.
 - **No `profiles` table.** Author identity comes from the Supabase session (`user.email`) rather than a separate normalized table — this app has no roles/permissions beyond "signed in or not," so a `profiles` table would be complexity without payoff at this scope. One deviation from a pure "no denormalization" stance: the `announcements` table stores `author_email` alongside `author_id`, because Supabase's client APIs never expose `auth.users` for anyone but the current session's own user — without a stored email, there'd be no way to show who else posted something.
 - **Plain `<form action>` + `useActionState`, not React Hook Form.** Forms are small (2–3 fields) and validation is server-authoritative via Zod inside each Server Action; adding a client form library wouldn't buy much here. `useActionState` handles pending/error UI without extra dependencies.
-- **Self-serve signup, plus an optional seeded demo account.** `/signup` lets anyone create their own account, so this is testable without needing anything from me. For a quicker look, `supabase/seed_demo_user.sql` (Setup step 5) seeds one fixed demo login — it's a throwaway account with no elevated access, since this app has no admin role at all.
+- **Self-serve signup, plus two seeded demo accounts.** `/signup` lets anyone create their own account, so this is testable without needing anything from me. For a quicker look, the connected Supabase project already has two demo accounts with sample announcements (Setup step 5) — throwaway accounts with no elevated access, since this app has no admin role at all.
 - **Single-column feed, no grid.** Announcements are pinned-first then newest-first — a strictly linear order. A multi-column grid would visually break that ordering (and looks ragged with variable-length posts), so the feed is one centered column instead.
 - **No mobile nav drawer.** The portal currently has exactly one destination (the feed), so the top bar is a single static header with a sign-out button — a hamburger/drawer pattern would be solving a problem that doesn't exist yet.
 - **`is_pinned` is set at creation only.** There's no separate "pin/unpin an existing post" action — out of scope for a single-section assessment build, but the schema/sort logic already supports it if that's added later.
@@ -74,6 +77,5 @@ src/
     supabase/       # the only three places a Supabase client is created
     types/          # hand-written Database types
 supabase/
-  migrations/         # SQL schema (run manually, see Setup step 3)
-  seed_demo_user.sql  # optional demo login (run manually, see Setup step 5)
+  migrations/  # SQL schema (run manually, see Setup step 3)
 ```
